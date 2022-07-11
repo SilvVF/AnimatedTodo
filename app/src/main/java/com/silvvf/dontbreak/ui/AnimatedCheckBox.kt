@@ -1,7 +1,9 @@
 package com.silvvf.dontbreak.ui
 
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateSizeAsState
+import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -21,6 +23,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.silvvf.dontbreak.R
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -34,9 +37,11 @@ fun AnimatedCheckBox(
     backColor: Color = Color.Gray,
     onClick: (Boolean) -> Unit
     ) {
+    val coroutine = rememberCoroutineScope()
     var shouldDraw by remember { mutableStateOf(false) }
     val vector = ImageVector.vectorResource(id = R.drawable.ic_baseline_check_24)
     val painter = rememberVectorPainter(image = vector)
+    var sizeStart by remember { mutableStateOf(Size(0f, 0f))}
     var sizeAnim by remember { mutableStateOf(Size(0f, 0f))}
     var sizeAnim2 by remember { mutableStateOf(Size(0f, 0f))}
     val firstBoxTopLeft = animateSizeAsState(
@@ -46,6 +51,14 @@ fun AnimatedCheckBox(
             shouldDraw = true
         }
     )
+    val secondBoxAnimLength = remember {
+        Animatable(
+            initialValue = 0f
+        )
+    }
+    fun animateSecondLength(target: Float) = coroutine.launch {
+        secondBoxAnimLength.animateTo(target)
+    }
     val secondBoxAnim = animateSizeAsState(
         sizeAnim2,
         animationSpec = tween(1300, delayMillis = 1000),
@@ -65,6 +78,7 @@ fun AnimatedCheckBox(
         Canvas(
             modifier = canvasModifier,
         ) {
+            sizeStart = size
             sizeAnim = Size(size.width * 0.2f, size.height * 0.6f)
             sizeAnim2 = Size(size.width * 0.2f, height = size.height * 1.1f)
             rotate(-45f) {
@@ -76,18 +90,21 @@ fun AnimatedCheckBox(
                     else firstBoxTopLeft.value
                 )
             }
-            if (shouldDraw)
+            if (shouldRegress) {
+                animateSecondLength(0f)
+            } else {
+                animateSecondLength(sizeAnim2.height)
+            }
+            if (shouldDraw) {
                 rotate(180f + 45f) {
                     drawRoundRect(
                         color = darkColor,
                         topLeft = Offset(x = size.width * 0.3f, y = -size.height * -0.1f),
                         cornerRadius = CornerRadius(35f, 35f),
-                        size = if (shouldRegress) secondBoxRegress.value
-                        else secondBoxAnim.value.copy(
-                            width = sizeAnim2.width
-                        )
+                        size = Size(sizeAnim2.width, secondBoxAnimLength.value)
                     )
                 }
+            }
         }
     }
 }
