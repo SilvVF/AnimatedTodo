@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Inbox
@@ -66,13 +67,16 @@ class MainActivity : ComponentActivity() {
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.Center
                                 ) {
-                                    var shouldRegress by remember { mutableStateOf(false) }
                                     AnimatedCheckBox(
                                         modifier = Modifier.size(height = 20.dp, width = 20.dp),
                                         canvasModifier = Modifier.fillMaxSize(),
-                                        shouldRegress = shouldRegress
+                                        isDarkTheme = true,
+                                        lightColor = MaterialTheme.colorScheme.primary,
+                                        darkColor = MaterialTheme.colorScheme.primary,
+                                        backColor = MaterialTheme.colorScheme.surface,
+                                        boxOutline = MaterialTheme.colorScheme.outline
                                     ) {
-                                        shouldRegress = !it
+
                                     }
                                     SilvSwitch(Modifier.align(Alignment.Bottom))
                                 }
