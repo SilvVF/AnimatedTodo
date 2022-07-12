@@ -7,11 +7,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +20,7 @@ import com.silvvf.dontbreak.ui.*
 import com.silvvf.dontbreak.ui.theme.DontBreakTheme
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -28,73 +28,97 @@ class MainActivity : ComponentActivity() {
                 val configuration = LocalConfiguration.current
                 val screenWidth = configuration.screenWidthDp.dp.value
                 var checked by remember { mutableStateOf(false) }
-                Box {
-                    SilvDrawer(
-                        drawer = {
-                            Box(modifier = Modifier
-                                .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.surface)
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Top,
-                                    modifier = Modifier.fillMaxSize()
+                var opened by remember { mutableStateOf(false) }
+                Scaffold(
+
+                ) { it ->
+                    it.toString()
+                    Column {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(25.dp)
+                        .background(
+                        MaterialTheme.colorScheme.primary)
+                        .padding(4.dp)
+                    ){
+                        IconButton(onClick = { opened = !opened }) {
+                            Icon(imageVector = Icons.Default.Menu, contentDescription = null)
+                        }
+                    }
+                    Box {
+                        SilvDrawer(
+                            onSwipe = {
+                                opened = it
+                            },
+                            isDrawerOpened = opened,
+                            drawer = {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(MaterialTheme.colorScheme.surface)
                                 ) {
-                                    ProfilePic(
-                                        modifier = Modifier.align(Alignment.Start),
-                                        resId = R.drawable.profilepic
-                                    )
-                                    DrawerItem(
-                                        modifier = Modifier.fillMaxWidth(0.9f),
-                                        fontSize = 18,
-                                        imageVector = Icons.Outlined.Inbox
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Top,
+                                        modifier = Modifier.fillMaxSize()
                                     ) {
+                                        ProfilePic(
+                                            modifier = Modifier.align(Alignment.Start),
+                                            resId = R.drawable.profilepic
+                                        )
+                                        DrawerItem(
+                                            modifier = Modifier.fillMaxWidth(0.9f),
+                                            fontSize = 18,
+                                            imageVector = Icons.Outlined.Inbox
+                                        ) {
 
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        DrawerItem(
+                                            modifier = Modifier.fillMaxWidth(0.9f),
+                                            fontSize = 18,
+                                            itemText = "About",
+                                            fontColor = MaterialTheme.colorScheme.primary,
+                                            imageVector = Icons.Outlined.Info,
+                                            backgroundColor = MaterialTheme.colorScheme.surface
+                                        ) {
+                                        }
                                     }
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    DrawerItem(
-                                        modifier = Modifier.fillMaxWidth(0.9f),
-                                        fontSize = 18,
-                                        itemText = "About",
-                                        fontColor = MaterialTheme.colorScheme.primary,
-                                        imageVector = Icons.Outlined.Info,
-                                        backgroundColor = MaterialTheme.colorScheme.surface
+                                    Row(
+                                        Modifier.fillMaxSize(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
                                     ) {
+                                        AnimatedCheckBox(
+                                            modifier = Modifier.size(height = 20.dp, width = 20.dp),
+                                            canvasModifier = Modifier.fillMaxSize(),
+                                            isDarkTheme = true,
+                                            lightColor = MaterialTheme.colorScheme.primary,
+                                            darkColor = MaterialTheme.colorScheme.primary,
+                                            backColor = MaterialTheme.colorScheme.surface,
+                                            boxOutline = MaterialTheme.colorScheme.outline
+                                        ) {
+
+                                        }
+                                        SilvSwitch(Modifier.align(Alignment.Bottom))
                                     }
                                 }
-                                Row(
-                                    Modifier.fillMaxSize(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
+                            },
+                            screen = {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(MaterialTheme.colorScheme.primary)
                                 ) {
-                                    AnimatedCheckBox(
-                                        modifier = Modifier.size(height = 20.dp, width = 20.dp),
-                                        canvasModifier = Modifier.fillMaxSize(),
-                                        isDarkTheme = true,
-                                        lightColor = MaterialTheme.colorScheme.primary,
-                                        darkColor = MaterialTheme.colorScheme.primary,
-                                        backColor = MaterialTheme.colorScheme.surface,
-                                        boxOutline = MaterialTheme.colorScheme.outline
-                                    ) {
+                                    Column(Modifier.fillMaxSize()) {
 
                                     }
-                                    SilvSwitch(Modifier.align(Alignment.Bottom))
                                 }
-                            }
-                        },
-                        screen = {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(MaterialTheme.colorScheme.primary)
-                            ) {
-                                Column(Modifier.fillMaxSize()) {
-
-                                }
-                            }
-                        },
-                        expansionSize = (screenWidth * 0.65).dp
-                    )
+                            },
+                            expansionSize = (screenWidth * 0.65).dp
+                        )
+                    }
+                }
                 }
             }
         }

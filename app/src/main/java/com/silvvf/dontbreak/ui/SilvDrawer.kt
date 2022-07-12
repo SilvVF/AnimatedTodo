@@ -114,12 +114,12 @@ fun SilvDrawer(
     drawer: @Composable () -> Unit,
     screen: @Composable () -> Unit,
     expansionSize: Dp = 200.dp,
+    isDrawerOpened: Boolean,
+    onSwipe: (Boolean) -> Unit
 ) {
-    var isDrawerOpened by remember { mutableStateOf(false) }
-
     DrawerContainer(
         isDrawerOpened = isDrawerOpened,
-        onSwipe = { toOpen -> isDrawerOpened = toOpen },
+        onSwipe = { toOpen -> onSwipe(toOpen)},
         drawerWidth = expansionSize
     ) {
         drawer()
