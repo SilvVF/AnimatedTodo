@@ -35,7 +35,7 @@ fun AnimatedCheckBox(
     modifier: Modifier = Modifier,
     canvasModifier: Modifier = Modifier,
     innerBoxModifier: Modifier = Modifier,
-    isChecked: Boolean = true,
+    isChecked: Boolean,
     isDarkTheme: Boolean = false,
     darkColor: Color = Color.Blue,
     lightColor: Color = Color.Blue,
@@ -46,7 +46,6 @@ fun AnimatedCheckBox(
     val checkColor by remember { mutableStateOf(
         if (isDarkTheme) darkColor else lightColor
     ) }
-    var shouldRegress by remember { mutableStateOf(true) }
     val coroutine = rememberCoroutineScope()
     var sizeAnim by remember { mutableStateOf(Size(0f, 0f))}
     var sizeAnim2 by remember { mutableStateOf(Size(0f, 0f))}
@@ -63,7 +62,7 @@ fun AnimatedCheckBox(
     fun <T> animateLength(animatable: Animatable<T, AnimationVector1D>, target: T) = coroutine.launch {
         animatable.animateTo(target)
     }
-    if (shouldRegress) {
+    if (isChecked) {
         animateLength(secondBoxAnimLength, 0f)
         animateLength(firstBoxAnimLength, 0f)
     } else {
@@ -79,8 +78,7 @@ fun AnimatedCheckBox(
                 .background(backColor)
                 .border(1.dp, boxOutline, RoundedCornerShape(5.dp))
                 .clickable {
-                    shouldRegress = !shouldRegress
-                    onClick(!isChecked)
+                    onClick(isChecked)
                 }
         )
         Canvas(

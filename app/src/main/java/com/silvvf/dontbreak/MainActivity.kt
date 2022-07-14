@@ -1,6 +1,7 @@
 package com.silvvf.dontbreak
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -18,6 +19,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.silvvf.dontbreak.ui.*
 import com.silvvf.dontbreak.ui.theme.DontBreakTheme
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -25,6 +30,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             DontBreakTheme {
+                val coroutineScope = rememberCoroutineScope()
                 val configuration = LocalConfiguration.current
                 val screenWidth = configuration.screenWidthDp.dp.value
                 var checked by remember { mutableStateOf(false) }
@@ -38,7 +44,8 @@ class MainActivity : ComponentActivity() {
                         .fillMaxWidth()
                         .height(25.dp)
                         .background(
-                        MaterialTheme.colorScheme.primary)
+                            MaterialTheme.colorScheme.primary
+                        )
                         .padding(4.dp)
                     ){
                         IconButton(onClick = { opened = !opened }) {
@@ -89,6 +96,8 @@ class MainActivity : ComponentActivity() {
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center
                                     ) {
+                                        val _isChecked = remember { Channel<Boolean>() }
+                                        val isChecked = _isChecked.receiveAsFlow().collectAsState(initial = false)
                                         AnimatedCheckBox(
                                             modifier = Modifier.size(height = 20.dp, width = 20.dp),
                                             canvasModifier = Modifier.fillMaxSize(),
@@ -96,11 +105,22 @@ class MainActivity : ComponentActivity() {
                                             lightColor = MaterialTheme.colorScheme.primary,
                                             darkColor = MaterialTheme.colorScheme.primary,
                                             backColor = MaterialTheme.colorScheme.surface,
-                                            boxOutline = MaterialTheme.colorScheme.outline
+                                            boxOutline = MaterialTheme.colorScheme.outline,
+                                            isChecked = isChecked.value
                                         ) {
-
+                                           coroutineScope.launch {
+                                               _isChecked.send(!it)
+                                               Log.d("isChecked", isChecked.toString())
+                                           }
                                         }
-                                        SilvSwitch(Modifier.align(Alignment.Bottom))
+                                        var isDarkTheme by remember { mutableStateOf(false) }
+                                        AnimatedText(text = "example", fontSize = 24, isChecked = isChecked.value)
+                                        SilvSwitch(
+                                            Modifier.align(Alignment.Bottom),
+                                            isDarkTheme = isDarkTheme
+                                        ){ prevDarkValue ->
+                                            isDarkTheme = !prevDarkValue
+                                        }
                                     }
                                 }
                             },
