@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +49,12 @@ fun AnimatedCheckBox(
     val coroutine = rememberCoroutineScope()
     var sizeAnim by remember { mutableStateOf(Size(0f, 0f))}
     var sizeAnim2 by remember { mutableStateOf(Size(0f, 0f))}
-    var sizeLine by remember { mutableStateOf(Size(0f, 0f)) }
+    var sizeLine by remember { mutableStateOf(0f) }
+    val lineAnimLength = remember {
+        Animatable(
+            initialValue = 0f
+        )
+    }
     val firstBoxAnimLength = remember {
         Animatable(
             initialValue = 0f,
@@ -62,12 +68,19 @@ fun AnimatedCheckBox(
     fun <T> animateLength(animatable: Animatable<T, AnimationVector1D>, target: T) = coroutine.launch {
         animatable.animateTo(target)
     }
-    if (isChecked) {
-        animateLength(secondBoxAnimLength, 0f)
-        animateLength(firstBoxAnimLength, 0f)
-    } else {
-        animateLength(firstBoxAnimLength, sizeAnim.height)
-        animateLength(secondBoxAnimLength, sizeAnim2.height)
+    LaunchedEffect (isChecked) {
+        when (isChecked) {
+            true -> {
+                animateLength(firstBoxAnimLength, sizeAnim.height)
+                animateLength(secondBoxAnimLength, sizeAnim2.height)
+                lineAnimLength.animateTo(sizeLine + 10f)
+            }
+            false -> {
+                animateLength(secondBoxAnimLength, 0f)
+                animateLength(firstBoxAnimLength, 0f)
+                lineAnimLength.animateTo(0f)
+            }
+        }
     }
     Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -76,14 +89,14 @@ fun AnimatedCheckBox(
         Box(modifier = modifier) {
             Box(
                     modifier = innerBoxModifier
-                            .fillMaxSize()
-                            .padding(1.dp)
-                            .clip(RoundedCornerShape(5.dp))
-                            .background(backColor)
-                            .border(1.dp, boxOutline, RoundedCornerShape(5.dp))
-                            .clickable {
-                                onClick(isChecked)
-                            }
+                        .fillMaxSize()
+                        .padding(1.dp)
+                        .clip(RoundedCornerShape(5.dp))
+                        .background(backColor)
+                        .border(1.dp, boxOutline, RoundedCornerShape(5.dp))
+                        .clickable {
+                            onClick(isChecked)
+                        }
             )
             Canvas(
                     modifier = canvasModifier,
@@ -110,33 +123,19 @@ fun AnimatedCheckBox(
         }
         Spacer(modifier = Modifier.width(14.dp))
         Box(modifier = Modifier
-                .fillMaxWidth(0.8f),
+                .wrapContentWidth(),
                 contentAlignment = Alignment.CenterStart
         ) {
-            val textPaint = Paint().asFrameworkPaint().apply {
-                isAntiAlias = true
-                textSize = fontSize.sp.value
-                color = android.graphics.Color.BLUE
-                typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
-            }
+            Text(text = todoTitle)
             Canvas(modifier = Modifier
-                    .wrapContentWidth()
-                    .height(30.dp)) {
-
-                sizeLine = Size(size.width * 0.2f, size.height * 0.6f)
-                drawIntoCanvas {
-                    it.nativeCanvas.drawText(
-                            "My Jetpack Compose Text",
-                            (0f),            // x-coordinates of the origin (top left)
-                            (46f) , // y-coordinates of the origin (top left)
-                            textPaint
-                    )
-                }
+                .matchParentSize()
+                .height(30.dp)) {
+                sizeLine = this.size.width
                 drawRoundRect(
                         color = Color.LightGray,
-                        topLeft = Offset(x = this.size.width * 0.1f, y = this.size.height * 0.1f),
+                        topLeft = Offset(x = 0f , y = this.size.height * 0.5f),
                         cornerRadius = CornerRadius(35f, 35f),
-                        size =  Size(sizeLine.width, 9f)
+                        size =  Size(width =  lineAnimLength.value , 10f)
                 )
             }
         }
