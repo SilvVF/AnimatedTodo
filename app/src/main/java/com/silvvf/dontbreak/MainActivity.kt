@@ -96,31 +96,7 @@ class MainActivity : ComponentActivity() {
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center
                                     ) {
-                                        val _isChecked = remember { Channel<Boolean>() }
-                                        val isChecked = _isChecked.receiveAsFlow().collectAsState(initial = false)
-                                        AnimatedCheckBox(
-                                            modifier = Modifier.size(height = 20.dp, width = 20.dp),
-                                            canvasModifier = Modifier.fillMaxSize(),
-                                            isDarkTheme = true,
-                                            lightColor = MaterialTheme.colorScheme.primary,
-                                            darkColor = MaterialTheme.colorScheme.primary,
-                                            backColor = MaterialTheme.colorScheme.surface,
-                                            boxOutline = MaterialTheme.colorScheme.outline,
-                                            isChecked = isChecked.value
-                                        ) {
-                                           coroutineScope.launch {
-                                               _isChecked.send(!it)
-                                               Log.d("isChecked", isChecked.toString())
-                                           }
-                                        }
-                                        var isDarkTheme by remember { mutableStateOf(false) }
-                                        AnimatedText(text = "example", fontSize = 24, isChecked = isChecked.value)
-                                        SilvSwitch(
-                                            Modifier.align(Alignment.Bottom),
-                                            isDarkTheme = isDarkTheme
-                                        ){ prevDarkValue ->
-                                            isDarkTheme = !prevDarkValue
-                                        }
+
                                     }
                                 }
                             },
@@ -131,7 +107,30 @@ class MainActivity : ComponentActivity() {
                                         .background(MaterialTheme.colorScheme.primary)
                                 ) {
                                     Column(Modifier.fillMaxSize()) {
-
+                                        val _isChecked = remember { Channel<Boolean>() }
+                                        val isChecked = _isChecked.receiveAsFlow().collectAsState(initial = false)
+                                        AnimatedCheckBox(
+                                            modifier = Modifier.size(height = 20.dp, width = 20.dp),
+                                            canvasModifier = Modifier.fillMaxSize(),
+                                            isDarkTheme = true,
+                                            lightColor = MaterialTheme.colorScheme.primary,
+                                            darkColor = MaterialTheme.colorScheme.primary,
+                                            backColor = MaterialTheme.colorScheme.surface,
+                                            boxOutline = MaterialTheme.colorScheme.outline,
+                                            isChecked = isChecked.value,
+                                        ) {
+                                            coroutineScope.launch {
+                                                _isChecked.send(!it)
+                                                Log.d("isChecked", isChecked.toString())
+                                            }
+                                        }
+                                        var isDarkTheme by remember { mutableStateOf(false) }
+                                        SilvSwitch(
+                                            Modifier,
+                                            isDarkTheme = isDarkTheme
+                                        ){ prevDarkValue ->
+                                            isDarkTheme = !prevDarkValue
+                                        }
                                     }
                                 }
                             },
