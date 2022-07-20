@@ -39,7 +39,8 @@ class MainActivity : ComponentActivity() {
                 val screenWidth = configuration.screenWidthDp.dp.value
                 var checked by remember { mutableStateOf(false) }
                 var opened by remember { mutableStateOf(false) }
-                Surface {
+                Scaffold() { it ->
+                    it.toString()
                     MainScreen()
                 }
             }

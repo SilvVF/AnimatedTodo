@@ -2,8 +2,8 @@ package com.silvvf.dontbreak.ui
 
 
 import android.graphics.Typeface
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.Animatable
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,6 +46,9 @@ fun AnimatedCheckBox(
     val checkColor by remember { mutableStateOf(
         if (isDarkTheme) darkColor else lightColor
     ) }
+    var textColor by remember {
+        mutableStateOf(Color.Black)
+    }
     val coroutine = rememberCoroutineScope()
     var sizeAnim by remember { mutableStateOf(Size(0f, 0f))}
     var sizeAnim2 by remember { mutableStateOf(Size(0f, 0f))}
@@ -53,6 +56,11 @@ fun AnimatedCheckBox(
     val lineAnimLength = remember {
         Animatable(
             initialValue = 0f
+        )
+    }
+    val textColorAnim = remember {
+        Animatable(
+            initialValue = textColor,
         )
     }
     val firstBoxAnimLength = remember {
@@ -73,12 +81,21 @@ fun AnimatedCheckBox(
             true -> {
                 animateLength(firstBoxAnimLength, sizeAnim.height)
                 animateLength(secondBoxAnimLength, sizeAnim2.height)
-                lineAnimLength.animateTo(sizeLine + 10f)
+                launch {
+                    lineAnimLength.animateTo(sizeLine + 10f)
+                }
+                launch { textColorAnim.animateTo(
+                    Color.LightGray,
+                    //animationSpec = tween(
+                      //  durationMillis = 100,
+                      //  easing = FastOutLinearInEasing)
+                ) }
             }
             false -> {
                 animateLength(secondBoxAnimLength, 0f)
                 animateLength(firstBoxAnimLength, 0f)
-                lineAnimLength.animateTo(0f)
+                launch {  lineAnimLength.animateTo(0f) }
+                launch { textColorAnim.animateTo(Color.Black) }
             }
         }
     }
@@ -86,7 +103,8 @@ fun AnimatedCheckBox(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
     ) {
-        Box(modifier = modifier) {
+        Box(modifier = modifier,
+        contentAlignment = Alignment.Center) {
             Box(
                     modifier = innerBoxModifier
                         .fillMaxSize()
@@ -126,7 +144,10 @@ fun AnimatedCheckBox(
                 .wrapContentWidth(),
                 contentAlignment = Alignment.CenterStart
         ) {
-            Text(text = todoTitle)
+            Text(
+                text = todoTitle,
+                color = textColorAnim.value
+            )
             Canvas(modifier = Modifier
                 .matchParentSize()
                 .height(30.dp)) {

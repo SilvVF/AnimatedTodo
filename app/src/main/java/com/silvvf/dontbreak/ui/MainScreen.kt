@@ -28,105 +28,108 @@ fun MainScreen(
     val state = viewModel.state
     val context = LocalContext.current
     val screenWidth = LocalConfiguration.current.screenWidthDp
-        Row(modifier = Modifier
+    Column() {
+        Row(
+            modifier = Modifier
                 .fillMaxWidth()
                 .height(25.dp)
                 .background(
-                        MaterialTheme.colorScheme.primary
+                    MaterialTheme.colorScheme.primary
                 )
                 .padding(4.dp)
-        ){
+        ) {
             IconButton(onClick = { viewModel.onEvent(MainScreenEvent.OnDrawerClicked) }) {
                 Icon(imageVector = Icons.Default.Menu, contentDescription = null)
             }
         }
         Box {
             SilvDrawer(
-                    onSwipe = {
-                        viewModel.onEvent(MainScreenEvent.OnDrawerClicked)
-                    },
-                    isDrawerOpened = state.isDrawerOpen,
-                    drawer = {
-                        Box(
-                                modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(MaterialTheme.colorScheme.surface)
+                onSwipe = {
+                    viewModel.onEvent(MainScreenEvent.OnDrawerClicked)
+                },
+                isDrawerOpened = state.isDrawerOpen,
+                drawer = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surface)
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Top,
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Top,
-                                    modifier = Modifier.fillMaxSize()
-                            ) {
-                                ProfilePic(
-                                        modifier = Modifier.align(Alignment.Start),
-                                        resId = com.silvvf.dontbreak.R.drawable.profilepic
-                                )
-                                DrawerItem(
-                                        modifier = Modifier.fillMaxWidth(0.9f),
-                                        fontSize = 18,
-                                        imageVector = Icons.Outlined.Inbox
-                                ) {
-
-                                }
-                                Spacer(modifier = Modifier.height(8.dp))
-                                DrawerItem(
-                                        modifier = Modifier.fillMaxWidth(0.9f),
-                                        fontSize = 18,
-                                        itemText = "About",
-                                        fontColor = MaterialTheme.colorScheme.primary,
-                                        imageVector = Icons.Outlined.Info,
-                                        backgroundColor = MaterialTheme.colorScheme.surface
-                                ) {
-                                }
-                            }
-                            Row(
-                                    Modifier.fillMaxSize(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
+                            ProfilePic(
+                                modifier = Modifier.align(Alignment.Start),
+                                resId = com.silvvf.dontbreak.R.drawable.profilepic
+                            )
+                            DrawerItem(
+                                modifier = Modifier.fillMaxWidth(0.9f),
+                                fontSize = 18,
+                                imageVector = Icons.Outlined.Inbox
                             ) {
 
                             }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            DrawerItem(
+                                modifier = Modifier.fillMaxWidth(0.9f),
+                                fontSize = 18,
+                                itemText = "About",
+                                fontColor = MaterialTheme.colorScheme.primary,
+                                imageVector = Icons.Outlined.Info,
+                                backgroundColor = MaterialTheme.colorScheme.surface
+                            ) {
+                            }
                         }
-                    },
-                    screen = {
-                        Box(
-                                modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(MaterialTheme.colorScheme.primary)
+                        Row(
+                            Modifier.fillMaxSize(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                            var isDarkTheme by remember { mutableStateOf(false) }
-                            LazyColumn(Modifier.fillMaxSize()) {
-                                items(state.todos, key = {
-                                    it.title
-                                }) {
-                                    var isChecked by remember {
-                                        mutableStateOf(it.isChecked)
-                                    }
-                                    AnimatedCheckBox(
-                                            modifier = Modifier.size(height = 20.dp, width = 20.dp),
-                                            canvasModifier = Modifier.fillMaxSize(),
-                                            isDarkTheme = true,
-                                            lightColor = MaterialTheme.colorScheme.primary,
-                                            darkColor = MaterialTheme.colorScheme.primary,
-                                            backColor = MaterialTheme.colorScheme.surface,
-                                            boxOutline = MaterialTheme.colorScheme.outline,
-                                            isChecked = isChecked,
-                                    ) {
-                                        isChecked = !it
-                                    }
+
+                        }
+                    }
+                },
+                screen = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background)
+                    ) {
+                        var isDarkTheme by remember { mutableStateOf(false) }
+                        LazyColumn(Modifier.fillMaxSize()) {
+                            items(state.todos, key = {
+                                it.title
+                            }) {
+                                var isChecked by remember {
+                                    mutableStateOf(it.isChecked)
                                 }
-                                item {
-                                    SilvSwitch(
-                                            Modifier,
-                                            isDarkTheme = isDarkTheme
-                                    ) { prevDarkValue ->
-                                        isDarkTheme = !prevDarkValue
-                                    }
+                                AnimatedCheckBox(
+                                    modifier = Modifier.size(height = 25.dp, width = 25.dp),
+                                    canvasModifier = Modifier.fillMaxSize(),
+                                    isDarkTheme = true,
+                                    lightColor = MaterialTheme.colorScheme.primary,
+                                    darkColor = MaterialTheme.colorScheme.primary,
+                                    backColor = MaterialTheme.colorScheme.surface,
+                                    boxOutline = MaterialTheme.colorScheme.outline,
+                                    isChecked = isChecked,
+                                ) {
+                                    isChecked = !it
+                                }
+                            }
+                            item {
+                                SilvSwitch(
+                                    Modifier,
+                                    isDarkTheme = isDarkTheme
+                                ) { prevDarkValue ->
+                                    isDarkTheme = !prevDarkValue
                                 }
                             }
                         }
-                    },
-                    expansionSize = (screenWidth * 0.65).dp
+                    }
+                },
+                expansionSize = (screenWidth * 0.65).dp
             )
         }
+    }
 }
